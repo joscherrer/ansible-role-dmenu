@@ -1,0 +1,11 @@
+- name: Uninstalling dmenu
+  become: yes
+  make:
+    target: uninstall
+    chdir: "/opt/dmenu-{{ dmenu_local_version }}"
+
+- name: Removing source folder
+  become: true
+  file:
+    path: "/opt/dmenu-{{ dmenu_local_version }}"
+    state: absent

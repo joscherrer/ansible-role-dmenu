@@ -1,0 +1,49 @@
+- name: Downloading the latest version of dmenu
+  unarchive:
+    src: "https://dl.suckless.org/tools/dmenu-{{ dmenu_git_version }}.tar.gz"
+    dest: /opt/
+    remote_src: yes
+  become: yes
+
+- name: Creating dmenu patch dir
+  become: yes
+  file:
+    path: /opt/dmenu-{{ dmenu_git_version }}/patches
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Downloading patches
+  become: yes
+  get_url:
+    url: "{{ item }}"
+    dest: /opt/dmenu-{{ dmenu_git_version }}/patches/
+  loop: "{{ patches_list }}"
+
+- name: Getting patches files
+  find:
+    paths: /opt/dmenu-{{ dmenu_git_version }}/patches/
+  register: patches_remote
+
+- name: Apply patches
+  become: yes
+  shell: patch < {{ item.path }}
+  args:
+    chdir: /opt/dmenu-{{ dmenu_git_version }}/
+  loop: "{{ patches_remote.files }}"
+
+- name: Making dmenu
+  become: yes
+  make:
+    chdir: "/opt/dmenu-{{ dmenu_git_version }}"
+
+- name: Installing dmenu
+  become: yes
+  make: 
+    chdir: "/opt/dmenu-{{ dmenu_git_version }}"
+    target: install
+    params:
+      PREFIX: "{{ prefix }}"
+      DESTDIR: "{{ destdir }}"
+

@@ -1,0 +1,12 @@
+---
+# defaults file for ansible-role-dmenu
+
+prefix: "/usr/local"
+destdir: ""
+bin_path: /usr/local/bin/dmenu
+dmenu_force_install: false
+dmenu_install_version: "4.9"
+
+patches_list:
+  - https://tools.suckless.org/dmenu/patches/xresources/dmenu-xresources-4.9.diff
+  - https://tools.suckless.org/dmenu/patches/numbers/dmenu-numbers-4.9.diff
