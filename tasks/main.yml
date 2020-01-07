@@ -2,7 +2,9 @@
 # tasks file for ansible-role-dmenu
 
 - name: Getting latest dmenu version
-  shell: git ls-remote --tags https://git.suckless.org/dmenu | sed 's/.*\///' | egrep "^[0-9]*(\.[0-9]*)(\.[0-9]*)?" | sort | tail -n1
+  shell: | # noqa 303
+    set -o pipefail
+    git ls-remote --tags https://git.suckless.org/dmenu | sed 's/.*\///' | egrep "^[0-9]*(\.[0-9]*)(\.[0-9]*)?" | sort | tail -n1
   register: dmenu_git
   changed_when: false
 
@@ -18,7 +20,9 @@
   register: dmenu_installed
 
 - name: Getting current dmenu version
-  shell: "{{ prefix }}/bin/dmenu -v | sed 's/dmenu-//'"
+  shell: |
+    set -o pipefail
+    "{{ prefix }}/bin/dmenu -v | sed 's/dmenu-//'"
   when: dmenu_installed.stat.exists
   register: dmenu_local
   changed_when: false
@@ -39,11 +43,11 @@
   when: dmenu_installed.stat.exists
 
 - include_tasks: uninstall.yml
-  when: 
-    - dmenu_installed.stat.exists 
+  when:
+    - dmenu_installed.stat.exists
     - (dmenu_git_version != dmenu_local_version) or dmenu_force_install
 
 - include_tasks: install.yml
-  when: not dmenu_installed.stat.exists or 
-        dmenu_force_install or 
+  when: not dmenu_installed.stat.exists or
+        dmenu_force_install or
         (dmenu_git_version != dmenu_local_version)

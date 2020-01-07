@@ -28,9 +28,9 @@
 
 - name: Apply patches
   become: yes
-  shell: patch < {{ item.path }}
-  args:
-    chdir: /opt/dmenu-{{ dmenu_git_version }}/
+  patch:
+    src: "{{ item.path }}"
+    basedir: /opt/dmenu-{{ dmenu_git_version }}/
   loop: "{{ patches_remote.files }}"
 
 - name: Making dmenu
@@ -40,7 +40,7 @@
 
 - name: Installing dmenu
   become: yes
-  make: 
+  make:
     chdir: "/opt/dmenu-{{ dmenu_git_version }}"
     target: install
     params:
